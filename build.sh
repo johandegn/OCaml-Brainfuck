@@ -1,7 +1,7 @@
 #!/bin/bash
 
+ocamlopt -c tokens.ml
 ocamlc -c lexer.mli
-#ocamlopt -c tokens.ml lexer.ml
-ocamlopt tokens.ml lexer.ml
+ocamlopt lexer.ml
 
-rm *.cmi *.cmx
+rm *.cmi *.cmx *.o
