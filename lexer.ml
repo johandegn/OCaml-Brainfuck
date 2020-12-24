@@ -36,6 +36,3 @@ let cleanup str =
 
 let tokenize str =
   create_tokens (cleanup str);;
-
-  tokenize "abc 829374 +.,-] [<, > dsf";;
-  print_int (List.length (cleanup "abc 829374 +.,-] [<, > dsf"));;
