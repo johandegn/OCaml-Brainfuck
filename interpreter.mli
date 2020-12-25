@@ -1,1 +1,1 @@
-val eval : Nodes.node -> int list * int;;
+val eval : Nodes.node -> int list -> int list * int;;
