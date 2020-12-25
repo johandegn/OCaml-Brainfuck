@@ -1,12 +1,8 @@
-(*
-type io =
-  | GetInput
-  | PrintOutput
-*)
-
 type node = 
-  | NodeList of node list
+  | Tuple of node * node
+  | Loop of node
   | ChangeVal of int
   | ChangePtr of int
-  | Loop of node
-  (*| IO of io*)
+  | PrintValue
+  | InputValue
+  | Nop
