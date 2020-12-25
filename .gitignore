@@ -28,3 +28,12 @@ setup.log
 
 # Local OPAM switch
 _opam/
+
+### vscode ###
+.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace

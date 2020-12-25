@@ -35,7 +35,7 @@ let rec generate_ast token_lst =
       | Tokens.OpenBracket::l -> inner l (c + 1)
       | Tokens.CloseBracket::l -> if c == 0 then l else inner l (c - 1)
       | _::l -> inner l c
-      | _ -> failwith "This cannot happen, unless you forgot to check that paranteses match.." in
+      | _ -> failwith "This cannot happen, unless its forgotten to check that paranteses match.." in
     inner lst 0 in
 
   match token_lst with
@@ -53,9 +53,4 @@ let rec generate_ast token_lst =
 
 let parse token_lst = 
   if not (paranteses_match token_lst) then failwith "Mismatching parenteses";
-  
   generate_ast token_lst;;
-
-
-(*parse (Lexer.tokenize "abc 829374 +.,-[[]asdf[asdf]f asfd] <, > dsf");;*)
-parse (Lexer.tokenize "-+++++[<[<<,.>]>[+,]<.>]>>--");;
