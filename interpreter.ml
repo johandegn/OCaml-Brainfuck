@@ -24,7 +24,7 @@ let rec change_val lst ptr n =
 let rec print_val lst ptr = 
   let (lst1, lst2) = lists_from_ptr lst ptr in
   match lst2 with
-  | v::_-> if v < 0 || v > 127 then failwith "Value out of bounds" else print_char (Char.chr v)
+  | v::_-> if v < 0 || v > 127 then failwith "Value out of bounds" else print_char (Char.chr v); flush stdout
   | _ -> failwith "List was empty. This should not be able to happen" (* shut up OCaml warnings *)
 
 let check_value lst ptr n =
