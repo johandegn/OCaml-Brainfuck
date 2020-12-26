@@ -30,7 +30,7 @@ let cleanup str =
   let max = String.length str - 1 in
   let rec clean i =
     let c = str.[i] in
-    let tail = (if i == max then [] else (clean (i + 1))) in
+    let tail = (if i = max then [] else (clean (i + 1))) in
     if valid_symbol c then c::tail else tail in
   clean 0
 

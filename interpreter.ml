@@ -1,47 +1,42 @@
-let lists_from_ptr lst ptr = 
+let lists_from_ptr lst ptr =
   if ptr < 0 then failwith "Pointer is negative" else
   
   let corrected_list lst =
     match lst with
     | [] -> 0::[]
-    | _::_ -> lst in
+    | _ -> lst in
   
-  let rec inner lst ptr = 
+  let rec inner lst ptr =
     let clst = (corrected_list lst) in
-    if ptr == 0 then ([], clst) else
-    match clst with
-    | e::l1 -> let (l2, l3) = inner l1 (ptr - 1) in (e::l2, l3)
-    | _ -> failwith "List was empty. This should not be able to happen" in (* shut up OCaml warnings *)
+    if ptr = 0 then
+      match clst with
+      | e::l -> ([], e, l)
+      | [] -> failwith "List was empty. This should not be able to happen"
+    else
+      match clst with
+      | e1::l1 -> let (l2, e2, l3) = inner l1 (ptr - 1) in (e1::l2, e2, l3)
+      | _ -> failwith "List was empty. This should not be able to happen" in (* shut up OCaml warnings *)
 
   inner lst ptr
 
 let rec change_val lst ptr n =
-  let (lst1, lst2) = lists_from_ptr lst ptr in
-  match lst2 with
-  | v::lst3 -> lst1 @ (v + n)::lst3
-  | _ -> failwith "List was empty. This should not be able to happen" (* shut up OCaml warnings *)
+  let (lst1, v, lst2) = lists_from_ptr lst ptr in
+  lst1 @ (v + n)::lst2
 
-let rec print_val lst ptr = 
-  let (lst1, lst2) = lists_from_ptr lst ptr in
-  match lst2 with
-  | v::_-> if v < 0 || v > 127 then failwith "Value out of bounds" else print_char (Char.chr v); flush stdout
-  | _ -> failwith "List was empty. This should not be able to happen" (* shut up OCaml warnings *)
+let rec print_val lst ptr =
+  let (lst1, v, lst2) = lists_from_ptr lst ptr in
+  if v < 0 || v >= 256 then failwith "Value out of bounds" 
+  else print_char (Char.chr v); flush stdout
 
 let check_value lst ptr n =
-  let (lst1, lst2) = lists_from_ptr lst ptr in
-  match lst2 with
-  | v::_ -> if n == v then true else false
-  | _ -> failwith "List was empty. This should not be able to happen" (* shut up OCaml warnings *)
+  let (lst1, v, lst2) = lists_from_ptr lst ptr in
+  if n = v then true else false
 
 let set_value lst ptr inp =
-  let (lst1, lst2) = lists_from_ptr lst ptr in
-  match lst2 with
-  | v::lst3 -> (
-    match inp with
-    | i::inp1 -> (lst1 @ i::lst3, inp1)
+  let (lst1, v, lst2) = lists_from_ptr lst ptr in
+  match inp with
+    | i::inp1 -> (lst1 @ i::lst2, inp1)
     | [] -> (lst, []) (* ignore if no input left *)
-  )
-  | _ -> failwith "List was empty. This should not be able to happen" (* shut up OCaml warnings *)
 
 let rec interpret lst ptr ast inp =
   match ast with

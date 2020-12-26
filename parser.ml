@@ -5,7 +5,7 @@ let paranteses_match token_lst =
     | Tokens.OpenBracket::l -> inner l (balance + 1)
     | Tokens.CloseBracket::l -> inner l (balance - 1)
     | _::l -> inner l balance
-    | [] -> if balance == 0 then true else false in
+    | [] -> if balance = 0 then true else false in
   inner token_lst 0
 
 let rec generate_ast token_lst =
@@ -33,7 +33,7 @@ let rec generate_ast token_lst =
     let rec inner lst c = 
       match lst with
       | Tokens.OpenBracket::l -> inner l (c + 1)
-      | Tokens.CloseBracket::l -> if c == 0 then l else inner l (c - 1)
+      | Tokens.CloseBracket::l -> if c = 0 then l else inner l (c - 1)
       | _::l -> inner l c
       | _ -> failwith "This cannot happen, unless its forgotten to check that paranteses match.." in
     inner lst 0 in

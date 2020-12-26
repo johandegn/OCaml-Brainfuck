@@ -1,7 +1,7 @@
 let encode_input str =
   let max = String.length str in
     let rec encode i =
-      if i == max then [] else (Char.code str.[i])::(encode (i + 1)) in
+      if i = max then [] else (Char.code str.[i])::(encode (i + 1)) in
   encode 0
 
 let run code input = Interpreter.eval (Parser.parse (Lexer.tokenize code)) (encode_input input);;
