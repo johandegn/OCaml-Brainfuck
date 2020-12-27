@@ -15,8 +15,7 @@ let lists_from_ptr lst ptr =
     else
       match clst with
       | e1::l1 -> let (l2, e2, l3) = inner l1 (ptr - 1) in (e1::l2, e2, l3)
-      | _ -> failwith "List was empty. This should not be able to happen" in (* shut up OCaml warnings *)
-
+      | _ -> failwith "List was empty. This should not be able to happen" in
   inner lst ptr
 
 let rec change_val lst ptr n =
@@ -55,6 +54,6 @@ let rec interpret lst ptr ast inp =
   | Nodes.PrintValue -> print_val lst ptr; (lst, ptr, inp)
   | Nop -> (lst, ptr, inp)
 
-let eval ast inp = 
+let eval ast inp =
   let (res_lst, res_ptr, _) = interpret [] 0 ast inp in
   (res_lst, res_ptr);;
