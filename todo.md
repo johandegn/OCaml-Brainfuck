@@ -1,0 +1,16 @@
+# To-Do feature list
+- Take command line arguments
+- Piped input
+- Run program from file or as argument
+- Take input from file or as argument
+- Argument to ask for additional input if needed
+- Argument to set Cell sizes (8, 16, 32 or unlimited?)
+- Overflow (wrap, fail/abort, undefined)
+- Memory size (default 30k, can be infinite)
+- Negative cells
+- End of input char ??
+- Argument to count and print instructions
+- Optimise (by cross compiling to OCaml or C)
+- Print resulting memory + pointer location
+- Argument to de
+- Add support for extended ascii (and unicode?)
