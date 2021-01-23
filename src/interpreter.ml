@@ -1,59 +1,55 @@
-let partition_list lst ptr =
-  if ptr < 0 then failwith "Pointer is negative" else
-  
-  let corrected_list lst =
+type memory = { l : int list; c : int; r : int list; ptr : int }
+
+let shift_memory mem am =
+  let fix_lst lst = (* TODO: Also remove 0 if they are leading or tailing to save memory? *)
     match lst with
     | [] -> 0::[]
     | _ -> lst in
   
-  let rec part lst ptr =
-    let clst = (corrected_list lst) in
-    if ptr = 0 then
-      match clst with
-      | e::l -> ([], e, l)
-      | [] -> failwith "List was empty. This should not be able to happen"
-    else
-      match clst with
-      | e1::l1 -> let (l2, e2, l3) = part l1 (ptr - 1) in (e1::l2, e2, l3)
-      | _ -> failwith "List was empty. This should not be able to happen" in
-  part lst ptr
+  let positive = am > 0 in
+  let rec inner mem i =
+    if i = 0 then mem else
+    let (new_l, new_c, new_r) = if positive then
+    match (fix_lst mem.r) with
+      | c::rs -> (mem.c::mem.l, c, rs)
+      | [] -> failwith "List was empty. This should not be able to happen" else
+    match (fix_lst mem.l) with
+      | c::ls -> (ls, c, mem.c::mem.r)
+      | [] -> failwith "List was empty. This should not be able to happen" in
+    inner {mem with l = new_l; r = new_r; c = new_c} (i - 1) in
+  let new_mem = inner mem (abs am) in {new_mem with ptr = mem.ptr + am}
 
-let rec change_val lst ptr n =
-  let (lst1, v, lst2) = partition_list lst ptr in
-  lst1 @ (v + n)::lst2
+(** Raises Failure exception if pointer is out of bounds *)
+let check_pointer mem =
+  if mem.ptr < 0 then failwith "Pointer out of bounds" else ()
 
-let rec print_val lst ptr =
-  let (lst1, v, lst2) = partition_list lst ptr in
+let print_value v =
   if v < 0 || v >= 256 then failwith "Value out of bounds" 
   else print_char (Char.chr v); flush stdout
 
-let check_value lst ptr n =
-  let (lst1, v, lst2) = partition_list lst ptr in
-  if n = v then true else false
-
-let set_value lst ptr inp =
-  let (lst1, v, lst2) = partition_list lst ptr in
+let handle_input mem inp =
+  let (v, inp1) =
   match inp with
-    | i::inp1 -> (lst1 @ i::lst2, inp1)
-    | [] -> (lst, []) (* ignore if no input left *)
+    | v::inp1 -> (v, inp1)
+    | [] -> (0, inp) in
+  ({mem with c = v}, inp1)
 
-let rec interpret lst ptr ast inp =
+let rec interpret mem ast inp =
   match ast with
-  | Nodes.Tuple (ast1, ast2) -> 
-    let (new_lst, new_ptr, new_inp) = interpret lst ptr ast1 inp in
-    interpret new_lst new_ptr ast2 new_inp
+  | Nodes.Tuple (ast1, ast2) ->
+    let (mem1, inp1) = interpret mem ast1 inp in
+    interpret mem1 ast2 inp1
   | Nodes.Loop ast1 ->
-    if (check_value lst ptr 0) then (lst, ptr, inp) else
-    let (new_lst, new_ptr, new_inp) = interpret lst ptr ast1 inp in
-    interpret new_lst new_ptr ast new_inp
-  | Nodes.ChangeVal n -> ((change_val lst ptr n), ptr, inp)
-  | Nodes.ChangePtr n -> (lst, ptr + n, inp)
-  | Nodes.InputValue -> 
-    let (lst1, inp1) = set_value lst ptr inp in
-    (lst1, ptr, inp1)
-  | Nodes.PrintValue -> print_val lst ptr; (lst, ptr, inp)
-  | Nop -> (lst, ptr, inp)
+    if mem.c = 0 then (mem, inp) else 
+    let (mem1, inp1) = interpret mem ast1 inp in
+    interpret mem1 ast inp1
+  | Nodes.ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
+  | Nodes.ChangePtr n -> (shift_memory mem n, inp)
+  | Nodes.InputValue -> check_pointer mem; handle_input mem inp
+  | Nodes.PrintValue -> check_pointer mem; print_value mem.c; (mem, inp)
+  | Nodes.Nop -> (mem, inp)
+
 
 let eval ast inp =
-  let (res_lst, res_ptr, _) = interpret [] 0 ast inp in
-  (res_lst, res_ptr);;
+  let (mem, res_inp) = interpret {l = []; c = 0; r = []; ptr = 0} ast inp in
+  (mem.r, mem.ptr) (* FIXME: return all mem and bounds*)
