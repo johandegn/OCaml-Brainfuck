@@ -1,5 +1,4 @@
 # To-Do feature list
-- Take command line arguments
 - Piped input
 - Run program from file or as argument
 - Take input from file or as argument
