@@ -1,0 +1,12 @@
+# To-Do feature list
+- Piped input
+- Argument to ask for additional input if needed
+- Argument to set Cell sizes (8, 16, 32 or unlimited?)
+- Overflow (wrap, fail/abort, undefined)
+- Memory size (default 30k, can be infinite)
+- Negative cells
+- End of input char ??
+- Argument to count and print instructions
+- Optimise (by cross compiling to OCaml or C)
+- Argument to print output to file
+- Add support for extended ascii (and unicode?)

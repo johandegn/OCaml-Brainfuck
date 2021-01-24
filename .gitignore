@@ -37,3 +37,6 @@ _opam/
 !.vscode/launch.json
 !.vscode/extensions.json
 *.code-workspace
+
+# final executable
+brainfuck
