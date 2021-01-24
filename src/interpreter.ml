@@ -1,5 +1,4 @@
-type memory = { l : int list; c : int; r : int list; ptr : int }
-
+open Memory;;
 
 let shift_memory mem am =
   let fix_lst lst = (* TODO: Also remove 0 if they are leading or tailing to save memory? *)
@@ -12,11 +11,11 @@ let shift_memory mem am =
     if i = 0 then mem else
     let (new_l, new_c, new_r) = if positive then
     match (fix_lst mem.r) with
-      | c::rs -> (mem.c::mem.l, c, rs)
-      | [] -> failwith "List was empty. This should not be able to happen" else
+    | c::rs -> (mem.c::mem.l, c, rs)
+    | [] -> failwith "List was empty. This should not be able to happen" else
     match (fix_lst mem.l) with
-      | c::ls -> (ls, c, mem.c::mem.r)
-      | [] -> failwith "List was empty. This should not be able to happen" in
+    | c::ls -> (ls, c, mem.c::mem.r)
+    | [] -> failwith "List was empty. This should not be able to happen" in
     inner {mem with l = new_l; r = new_r; c = new_c} (i - 1) in
   let new_mem = inner mem (abs am) in {new_mem with ptr = mem.ptr + am}
 
@@ -34,8 +33,8 @@ let print_value v =
 let handle_input mem inp =
   let (v, inp1) =
   match inp with
-    | v::inp1 -> (v, inp1)
-    | [] -> (0, inp) in
+  | v::inp1 -> (v, inp1)
+  | [] -> (0, inp) in
   ({mem with c = v}, inp1)
 
 

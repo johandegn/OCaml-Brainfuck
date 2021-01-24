@@ -2,6 +2,7 @@ let program_path = ref ""
 let program = ref ""
 let input_path = ref ""
 let input = ref ""
+let dump_memory = ref false
 
 let usage = "usage: " ^ Sys.argv.(0) ^ " [-c cmd | file] [-i file | input]"
 
@@ -32,6 +33,7 @@ let handle_anonymous arg =
 let speclist = [
     ("-c", Arg.String set_program, ": program passed in as string");
     ("-i", Arg.String set_input_path, ": loads input from file");
+    ("-d", Arg.Set dump_memory, ": dump memory after termination");
   ]
 
 
@@ -65,4 +67,5 @@ let run code input = Interpreter.eval (Parser.parse (Lexer.tokenize code)) (enco
 let () =
   Arg.parse speclist handle_anonymous usage;
   load_resources ();
-  let _ = run !program !input in ()
+  let mem = run !program !input in ();
+  if !dump_memory then Memory.print_memory mem

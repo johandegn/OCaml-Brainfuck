@@ -1,2 +1,1 @@
-type memory
-val eval : Nodes.node -> int list -> memory;;
+val eval : Nodes.node -> int list -> Memory.memory;;

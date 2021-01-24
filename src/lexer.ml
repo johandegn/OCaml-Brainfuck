@@ -1,4 +1,4 @@
-let rec create_tokens carr = 
+let rec create_tokens clst = 
   let get_token c = 
     match c with
     | ',' -> Tokens.Input
@@ -10,7 +10,7 @@ let rec create_tokens carr =
     | '[' -> Tokens.OpenBracket
     | ']' -> Tokens.CloseBracket
     | _ -> failwith "char array is not clean!" in (* shorthand for Failure exception*)
-  match carr with
+  match clst with
   | c::l -> (get_token c)::(create_tokens l)
   | [] -> []
 
@@ -28,6 +28,7 @@ let valid_symbol c =
   
 let cleanup str =
   let max = String.length str - 1 in
+  if max < 0 then [] else
   let rec clean i =
     let c = str.[i] in
     let tail = (if i = max then [] else (clean (i + 1))) in
