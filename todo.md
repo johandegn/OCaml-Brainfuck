@@ -1,7 +1,8 @@
 # To-Do feature list
 - Piped input
-- Argument to ask for additional input if needed
+- Negative input
 - Argument to set Cell sizes (8, 16, 32 or unlimited?)
+- Argument to ask for additional input if needed
 - Overflow (wrap, fail/abort, undefined)
 - Memory size (default 30k, can be infinite)
 - Negative cells

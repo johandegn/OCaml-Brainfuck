@@ -4,24 +4,38 @@ type memory = { l : int list; c : int; r : int list; ptr : int }
 let output_line idx idx_digits ncells lst ptr =
   let fixed_length length chr str =
     let amount = length - (String.length str) in
-    Printf.sprintf "%s%s" (String.make amount chr) str in
+    if amount < 0 then (* well, can't fit it in... *)
+      String.make length '?'
+    else
+      Printf.sprintf "%s%s" (String.make amount chr) str in
 
   (* print index *)
-  Printf.printf "%s: " (fixed_length idx_digits '0' (string_of_int idx));
+  Printf.printf "%s:  " (fixed_length idx_digits '0' (string_of_int idx));
 
   (* print cells *)
   let rec print_next i lst =
     if i = ncells then
-      lst
+      (lst, [])
     else
       let (l, ls) = match lst with
       | l'::ls' -> (l', ls')
       | [] -> (0, []) in
       let (c1, c2) = if ptr = i + idx then ('[', ']') else (' ',' ') in (* mark ptr location *)
       Printf.printf "%c%s%c" c1 (fixed_length 3 '0' (string_of_int l)) c2; (* FIXME: magic constant 3 *)
-      print_next (i + 1) ls in
+      let (rlst, cs) = print_next (i + 1) ls in (rlst, l::cs) in
+
+  let (res_lst, cells) = print_next 0 lst in
+
+  (* print char representation*)
+  let convert_and_print i =
+    let c = if i >= 32 && i <= 126 then
+      Char.chr i
+    else
+      '.' in
+    print_char c in
   
-  let res_lst = print_next 0 lst in
+  print_string "  ";
+  List.iter convert_and_print cells;
   print_endline "";
   res_lst
 
