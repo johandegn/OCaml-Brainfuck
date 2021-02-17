@@ -1,1 +1,1 @@
-val eval : Nodes.node -> int list -> Memory.memory;;
+val eval : Nodes.node -> int list -> Options.options -> Memory.memory;;

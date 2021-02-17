@@ -6,7 +6,6 @@
 - Overflow (wrap, fail/abort, undefined)
 - Memory size (default 30k, can be infinite)
 - Negative cells
-- End of input char ??
 - Argument to count and print instructions
 - Optimise (by cross compiling to OCaml or C)
 - Argument to print output to file
