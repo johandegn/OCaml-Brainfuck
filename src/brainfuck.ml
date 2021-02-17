@@ -33,18 +33,15 @@ let handle_anonymous arg =
     raise (Arg.Bad ("Too many anonymous arguments"))
 
 
-  let set_eoi c =
-    let len = String.length c in
-    if len <> 1 then 
-      raise (Arg.Bad "End-of-input should be a single char")
-    else options := {!options with end_of_input = (Char.code c.[0])}
+  let set_eoi i =
+    options := {!options with end_of_input = i}
 
 
 
 let speclist = [
     ("-c", Arg.String set_program, ": Program passed in as string.");
     ("-i", Arg.String set_input_path, ": Loads input from file.");
-    ("-e", Arg.String set_eoi, ": End-of-input char. Default is 0.");
+    ("-e", Arg.Int set_eoi, ": End-of-input value. Default is 0.");
     ("-d", Arg.Set dump_memory, ": Dump memory after termination.");
   ]
 
