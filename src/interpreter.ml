@@ -1,5 +1,8 @@
 open Memory;;
 
+exception Pointer of string
+exception Value of string
+
 let shift_memory mem am =
   let fix_lst lst = (* TODO: Also remove 0 if they are leading or tailing to save memory? *)
     match lst with
@@ -22,11 +25,11 @@ let shift_memory mem am =
 
 (** Raises Failure exception if pointer is out of bounds *)
 let check_pointer mem =
-  if mem.ptr < 0 then failwith "Pointer out of bounds" else ()
+  if mem.ptr < 0 then raise (Pointer "Pointer out of bounds") else ()
 
 
 let print_value v =
-  if v < 0 || v >= 256 then failwith "Value out of bounds" 
+  if v < 0 || v >= 256 then raise (Value "Value out of bounds")
   else print_char (Char.chr v); flush stdout
 
 

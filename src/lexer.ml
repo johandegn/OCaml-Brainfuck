@@ -28,7 +28,7 @@ let valid_symbol c =
   
 let cleanup str =
   let max = String.length str - 1 in
-  if max < 0 then [] else
+  if max < 0 then [] else (* if str is empty *)
   let rec clean i =
     let c = str.[i] in
     let tail = (if i = max then [] else (clean (i + 1))) in
