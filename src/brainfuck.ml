@@ -5,7 +5,8 @@ let program = ref ""
 let input_path = ref ""
 let input = ref ""
 let dump_memory = ref false
-let options = ref {end_of_input = 0}
+let request_input = ref false
+let options = ref {end_of_input = 0; request_input = false}
 
 let usage = "usage: " ^ Sys.argv.(0) ^ " [-c cmd | file] [-i file | input] [options]"
 
@@ -37,10 +38,10 @@ let handle_anonymous arg =
     options := {!options with end_of_input = i}
 
 
-
 let speclist = [
     ("-c", Arg.String set_program, ": Program passed in as string.");
     ("-i", Arg.String set_input_path, ": Loads input from file.");
+    ("-I", Arg.Set request_input, ": Request input if initial input is consumed. If none given default is end-of-input value");
     ("-e", Arg.Int set_eoi, ": End-of-input value. Default is 0.");
     ("-d", Arg.Set dump_memory, ": Dump memory after termination.");
   ]
@@ -67,10 +68,11 @@ let read_file filename =
 
 let load_resources () =
   if not (!program_path = "") then program := read_file !program_path;
-  if not (!input_path = "") then input := read_file !input_path
+  if not (!input_path = "") then input := read_file !input_path;
+  options := {!options with request_input = !request_input}
 
 
-let run code input options = Interpreter.eval (Parser.parse (Lexer.tokenize code)) (encode_input input) options;;
+let run code input options = Interpreter.eval (Parser.parse (Lexer.tokenize code)) (Utility.encode_input input) options;;
 
 
 let () =

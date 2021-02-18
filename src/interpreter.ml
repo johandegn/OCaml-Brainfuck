@@ -34,11 +34,20 @@ let print_value v =
   else print_char (Char.chr v); flush stdout
 
 
-let handle_input mem inp eoi =
+let get_inp () =
+  Utility.encode_input (read_line ())
+
+
+let handle_input mem inp opts =
   let (v, inp1) =
   match inp with
   | v::inp1 -> (v, inp1)
-  | [] -> (eoi, inp) in
+  | [] -> if opts.request_input then 
+    match (get_inp ()) with
+    | v::inp1 -> (v, inp1)
+    | [] -> (opts.end_of_input, inp)
+  else 
+    (opts.end_of_input, inp) in
   ({mem with c = v}, inp1)
 
 
@@ -54,7 +63,7 @@ let interpret mem ast inp opts =
       interpret mem1 ast inp1
     | Nodes.ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
     | Nodes.ChangePtr n -> (shift_memory mem n, inp)
-    | Nodes.InputValue -> check_pointer mem; handle_input mem inp opts.end_of_input
+    | Nodes.InputValue -> check_pointer mem; handle_input mem inp opts
     | Nodes.PrintValue -> check_pointer mem; print_value mem.c; (mem, inp)
     | Nodes.Nop -> (mem, inp) in
     interpret mem ast inp

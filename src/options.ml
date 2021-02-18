@@ -1,1 +1,1 @@
-type options = { end_of_input : int }
+type options = { end_of_input : int; request_input : bool }
