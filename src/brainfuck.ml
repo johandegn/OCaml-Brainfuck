@@ -47,20 +47,9 @@ let speclist = [
   ]
 
 
-let read_file filename =
-  let ch = open_in filename in
-  try
-    let s = really_input_string ch (in_channel_length ch - 1) in (* TODO: does -1 remove newline char, charied return, return or somthing?*)
-    close_in ch;
-    s
-  with e ->
-    close_in_noerr ch; (* emergency closing *)
-    raise e;;
-
-
 let load_resources () =
-  if not (!program_path = "") then program := read_file !program_path;
-  if not (!input_path = "") then input := read_file !input_path;
+  if not (!program_path = "") then program := Utility.read_file !program_path;
+  if not (!input_path = "") then input := Utility.read_file !input_path;
   options := {!options with request_input = !request_input}
 
 
