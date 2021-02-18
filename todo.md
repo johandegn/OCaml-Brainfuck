@@ -1,6 +1,5 @@
 # To-Do feature list
 - Add build system
-- Argument to ask for additional input if needed
 - Argument to count and print instructions
 - Add support for extended ascii (and unicode?)
 

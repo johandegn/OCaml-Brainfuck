@@ -29,9 +29,9 @@ let check_pointer mem =
   if mem.ptr < 0 then raise (Pointer "Pointer out of bounds") else ()
 
 
-let print_value v =
+let print_value v always_flush =
   if v < 0 || v >= 256 then raise (Value "Value out of bounds")
-  else print_char (Char.chr v); flush stdout
+  else print_char (Char.chr v); if always_flush then flush stdout
 
 
 let get_inp () =
@@ -64,7 +64,7 @@ let interpret mem ast inp opts =
     | Nodes.ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
     | Nodes.ChangePtr n -> (shift_memory mem n, inp)
     | Nodes.InputValue -> check_pointer mem; handle_input mem inp opts
-    | Nodes.PrintValue -> check_pointer mem; print_value mem.c; (mem, inp)
+    | Nodes.PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp)
     | Nodes.Nop -> (mem, inp) in
     interpret mem ast inp
 

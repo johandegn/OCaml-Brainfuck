@@ -1,1 +1,1 @@
-type options = { end_of_input : int; request_input : bool }
+type options = { end_of_input : int; request_input : bool; always_flush : bool }
