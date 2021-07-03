@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 cd src
 
 ocamlopt -c tokens.ml nodes.ml options.ml

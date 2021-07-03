@@ -42,7 +42,7 @@ let handle_anonymous arg =
 let speclist = [
     ("-c", Arg.String set_program, ": Program passed in as string.");
     ("-i", Arg.String set_input_path, ": Loads input from file.");
-    ("-I", Arg.Set request_input, ": Request input if initial input is consumed. If none given, end-of-input value i used.");
+    ("-I", Arg.Set request_input, ": Request input if initial input is consumed. If none given, end-of-input value is used.");
     ("-e", Arg.Int set_eoi, ": End-of-input value. Default is 0.");
     ("-d", Arg.Set dump_memory, ": Dump memory after termination.");
     ("-p", Arg.Set no_flush, ": Do NOT flush output on each print.");
