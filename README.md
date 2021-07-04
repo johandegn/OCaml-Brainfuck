@@ -1,4 +1,6 @@
 # Brainfuck
-Brainfuck implemented in OCaml
+Brainfuck implemented in OCaml.
 
-A lot of the example programs in the *programs* folder is taken directly from http://www.hevanet.com/cristofd/brainfuck/.
+Run `brainfuck --help` for options.
+
+A bunch of the example programs in the *programs* folder is taken directly from http://www.hevanet.com/cristofd/brainfuck/.
