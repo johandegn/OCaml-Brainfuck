@@ -1,10 +1,16 @@
+open Options
+
 let program_path = ref ""
 let program = ref ""
 let input_path = ref ""
 let input = ref ""
 let dump_memory = ref false
+let memory_dump_file = ref ""
+let request_input = ref false
+let no_flush = ref false
+let options = ref {end_of_input = 0; request_input = false; always_flush = false}
 
-let usage = "usage: " ^ Sys.argv.(0) ^ " [-c cmd | file] [-i file | input]"
+let usage = "usage: " ^ Sys.argv.(0) ^ " [-c cmd | file] [-i file | input] [options]"
 
 
 let set_input_path str =
@@ -20,7 +26,7 @@ let set_program str =
   else
     raise (Arg.Bad ("Only a single program argument is allowed"))
 
-
+(** Handle anonymous arguments *)
 let handle_anonymous arg =
   if !program = "" && !program_path = "" then
     program_path := arg
@@ -30,42 +36,33 @@ let handle_anonymous arg =
     raise (Arg.Bad ("Too many anonymous arguments"))
 
 
+  let set_eoi i =
+    options := {!options with end_of_input = i}
+
+
 let speclist = [
-    ("-c", Arg.String set_program, ": program passed in as string");
-    ("-i", Arg.String set_input_path, ": loads input from file");
-    ("-d", Arg.Set dump_memory, ": dump memory after termination");
+    ("-c", Arg.String set_program, ": Program passed in as string.");
+    ("-i", Arg.String set_input_path, ": Loads input from file.");
+    ("-I", Arg.Set request_input, ": Request input if initial input is consumed. If none given, end-of-input value is used.");
+    ("-e", Arg.Int set_eoi, ": End-of-input value. Default is 0.");
+    ("-d", Arg.Set dump_memory, ": Dump memory after termination.");
+    ("-D", Arg.Set_string memory_dump_file, ": Write memory dump to file after termination.");
+    ("-p", Arg.Set no_flush, ": Do NOT flush output on each print.");
   ]
 
 
-let encode_input str =
-  let max = String.length str in
-  let rec encode i =
-    if i = max then [] 
-    else (Char.code str.[i])::(encode (i + 1)) in
-  encode 0
-
-
-let read_file filename =
-  let ch = open_in filename in
-  try
-    let s = really_input_string ch (in_channel_length ch - 1) in (* TODO: does -1 remove newline char, charied return, return or somthing?*)
-    close_in ch;
-    s
-  with e ->
-    close_in_noerr ch; (* emergency closing *)
-    raise e;;
-
-
 let load_resources () =
-  if not (!program_path = "") then program := read_file !program_path;
-  if not (!input_path = "") then input := read_file !input_path
+  if not (!program_path = "") then program := Utility.read_file !program_path;
+  if not (!input_path = "") then input := Utility.read_file !input_path;
+  options := {!options with request_input = !request_input; always_flush = not !no_flush}
 
 
-let run code input = Interpreter.eval (Parser.parse (Lexer.tokenize code)) (encode_input input);;
+let run code input options = Interpreter.eval (Parser.parse (Lexer.tokenize code)) (Utility.encode_input input) options;;
 
 
 let () =
   Arg.parse speclist handle_anonymous usage;
   load_resources ();
-  let mem = run !program !input in ();
-  if !dump_memory then Memory.print_memory mem
+  let mem = run !program !input !options in ();
+  if !dump_memory then Memory.print_memory mem; (* print memory dump *)
+  if not (!memory_dump_file = "") then Memory.save_memory_to_file mem !memory_dump_file (* save memory dump to a file *)

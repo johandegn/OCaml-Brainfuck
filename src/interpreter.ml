@@ -1,4 +1,8 @@
-open Memory;;
+open Memory
+open Options
+
+exception Pointer of string
+exception Value of string
 
 let shift_memory mem am =
   let fix_lst lst = (* TODO: Also remove 0 if they are leading or tailing to save memory? *)
@@ -22,38 +26,49 @@ let shift_memory mem am =
 
 (** Raises Failure exception if pointer is out of bounds *)
 let check_pointer mem =
-  if mem.ptr < 0 then failwith "Pointer out of bounds" else ()
+  if mem.ptr < 0 then raise (Pointer "Pointer out of bounds") else ()
 
 
-let print_value v =
-  if v < 0 || v >= 256 then failwith "Value out of bounds" 
-  else print_char (Char.chr v); flush stdout
+let print_value v always_flush =
+  if v < 0 || v >= 256 then raise (Value "Value out of bounds")
+  else print_char (Char.chr v); if always_flush then flush stdout
 
 
-let handle_input mem inp =
+let get_inp () =
+  Utility.encode_input (read_line ())
+
+
+let handle_input mem inp opts =
   let (v, inp1) =
   match inp with
   | v::inp1 -> (v, inp1)
-  | [] -> (0, inp) in
+  | [] -> if opts.request_input then 
+    match (get_inp ()) with
+    | v::inp1 -> (v, inp1)
+    | [] -> (opts.end_of_input, inp)
+  else 
+    (opts.end_of_input, inp) in
   ({mem with c = v}, inp1)
 
 
-let rec interpret mem ast inp =
-  match ast with
-  | Nodes.Tuple (ast1, ast2) ->
-    let (mem1, inp1) = interpret mem ast1 inp in
-    interpret mem1 ast2 inp1
-  | Nodes.Loop ast1 ->
-    if mem.c = 0 then (mem, inp) else 
-    let (mem1, inp1) = interpret mem ast1 inp in
-    interpret mem1 ast inp1
-  | Nodes.ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
-  | Nodes.ChangePtr n -> (shift_memory mem n, inp)
-  | Nodes.InputValue -> check_pointer mem; handle_input mem inp
-  | Nodes.PrintValue -> check_pointer mem; print_value mem.c; (mem, inp)
-  | Nodes.Nop -> (mem, inp)
+let interpret mem ast inp opts =
+  let rec interpret mem ast inp =
+    match ast with
+    | Nodes.Tuple (ast1, ast2) ->
+      let (mem1, inp1) = interpret mem ast1 inp in
+      interpret mem1 ast2 inp1
+    | Nodes.Loop ast1 ->
+      if mem.c = 0 then (mem, inp) else 
+      let (mem1, inp1) = interpret mem ast1 inp in
+      interpret mem1 ast inp1
+    | Nodes.ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
+    | Nodes.ChangePtr n -> (shift_memory mem n, inp)
+    | Nodes.InputValue -> check_pointer mem; handle_input mem inp opts
+    | Nodes.PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp)
+    | Nodes.Nop -> (mem, inp) in
+    interpret mem ast inp
 
 
-let eval ast inp =
-  let (mem, res_inp) = interpret {l = []; c = 0; r = []; ptr = 0} ast inp in
+let eval ast inp opts =
+  let (mem, res_inp) = interpret {l = []; c = 0; r = []; ptr = 0} ast inp opts in
   mem

@@ -1,3 +1,5 @@
+exception Parse of string
+
 let paranteses_match token_lst = 
   let rec inner lst balance =
     if balance < 0 then false else
@@ -52,5 +54,5 @@ let rec generate_ast token_lst =
   | _ -> Nodes.Nop
 
 let parse token_lst = 
-  if not (paranteses_match token_lst) then failwith "Mismatching parenteses";
+  if not (paranteses_match token_lst) then raise (Parse "Mismatching parenteses");
   generate_ast token_lst;;
