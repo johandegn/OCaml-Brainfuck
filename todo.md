@@ -8,9 +8,3 @@
 - Memory size (default 30k, can be infinite)
 - Argument to set Cell sizes (8, 16, 32 or unlimited?)
 - Overflow (wrap, fail/abort, undefined)
-
-# Ideas list
-- Piped input
-- Compile to assembly?
-- Optimise (by cross compiling to OCaml or C)
-- Argument to print output to file
