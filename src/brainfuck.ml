@@ -5,6 +5,7 @@ let program = ref ""
 let input_path = ref ""
 let input = ref ""
 let dump_memory = ref false
+let memory_dump_file = ref ""
 let request_input = ref false
 let no_flush = ref false
 let options = ref {end_of_input = 0; request_input = false; always_flush = false}
@@ -25,7 +26,7 @@ let set_program str =
   else
     raise (Arg.Bad ("Only a single program argument is allowed"))
 
-
+(** Handle anonymous arguments *)
 let handle_anonymous arg =
   if !program = "" && !program_path = "" then
     program_path := arg
@@ -45,6 +46,7 @@ let speclist = [
     ("-I", Arg.Set request_input, ": Request input if initial input is consumed. If none given, end-of-input value is used.");
     ("-e", Arg.Int set_eoi, ": End-of-input value. Default is 0.");
     ("-d", Arg.Set dump_memory, ": Dump memory after termination.");
+    ("-D", Arg.Set_string memory_dump_file, ": Write memory dump to file after termination.");
     ("-p", Arg.Set no_flush, ": Do NOT flush output on each print.");
   ]
 
@@ -62,4 +64,5 @@ let () =
   Arg.parse speclist handle_anonymous usage;
   load_resources ();
   let mem = run !program !input !options in ();
-  if !dump_memory then Memory.print_memory mem
+  if !dump_memory then Memory.print_memory mem; (* print memory dump *)
+  if not (!memory_dump_file = "") then Memory.save_memory_to_file mem !memory_dump_file (* save memory dump to a file *)
