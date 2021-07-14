@@ -67,7 +67,7 @@ let print_time_diff start stop =
   let millisecs = (int_of_float millisec_diff) mod 1000 in
   let secs = (int_of_float millisec_diff / 1000) mod 60 in
   let mins = int_of_float millisec_diff / 60000 in
-  Printf.printf "\nExecution time: %dm %ds %dms (total: %fms)\n" mins secs millisecs millisec_diff;
+  Printf.printf "\n\nExecution time: %dm %ds %dms (total: %fms)\n" mins secs millisecs millisec_diff;
   flush stdout
 
 
