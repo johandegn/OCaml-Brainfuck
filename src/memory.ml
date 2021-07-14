@@ -1,7 +1,7 @@
 type memory = { l : int list; c : int; r : int list; ptr : int }
 
 
-let output_line idx idx_digits ncells lst ptr out_ch=
+let output_line idx idx_digits ncells lst ptr out_ch =
   let fixed_length length chr num =
     let str1 = string_of_int (abs num) in
     let real_length = length - (if num < 0 then 1 else 0) in
