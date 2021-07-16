@@ -2,6 +2,7 @@
 - Add build system
 - Argument to count and print instructions
 - Add support for extended ascii (and unicode?)
+- Add option for optimized parsing or raw. (and optimize '[-]' to cell = 0)
 
 - Negative cells
 - Negative input
