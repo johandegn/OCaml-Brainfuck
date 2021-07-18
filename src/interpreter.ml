@@ -66,7 +66,8 @@ let interpret mem ast inp opts =
     | Nodes.InputValue -> check_pointer mem; handle_input mem inp opts
     | Nodes.PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp)
     | Nodes.Nop -> (mem, inp) in
-    interpret mem ast inp
+  
+  interpret mem ast inp
 
 
 let eval ast inp opts =
