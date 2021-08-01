@@ -1,7 +1,7 @@
 # Brainfuck
 Brainfuck implemented in OCaml.
 
-Run `./build` to compile the interpreter.
+Run `./build.sh` to compile the interpreter.
 
 Run `./brainfuck --help` for options.
 
