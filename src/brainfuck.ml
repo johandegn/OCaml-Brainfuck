@@ -49,7 +49,7 @@ let speclist = [
     ("-d", Arg.Set dump_memory, ": Dump memory after termination.");
     ("-D", Arg.Set_string memory_dump_file, ": Write memory dump to file after termination.");
     ("-p", Arg.Set no_flush, ": Do NOT flush output on each print.");
-    ("-t", Arg.Set print_exec_time, ": Print execution time.");
+    ("-t", Arg.Set print_exec_time, ": Print execution and parse time.");
   ]
 
 
@@ -59,24 +59,44 @@ let load_resources () =
   options := {!options with request_input = !request_input; always_flush = not !no_flush}
 
 
-let run code input options = Interpreter.eval (Parser.parse (Lexer.tokenize code)) (Utility.encode_input input) options;;
+let run code input options =
+  let enc_inp = Utility.encode_input input in (* encode input *)
+
+  let start_parse_time = Unix.gettimeofday () in (* parse timing *)
+  let ast = Parser.parse (Lexer.tokenize code) in
+  let stop_parse_time = Unix.gettimeofday () in (* parse timing *)
+  
+  let start_exe_time = Unix.gettimeofday () in (* execution timing *)
+  let mem = Interpreter.eval ast enc_inp options in
+  let stop_exe_time = Unix.gettimeofday () in (* execution timing *)
+  (mem, (start_exe_time, stop_exe_time), (start_parse_time, stop_parse_time))
 
 
-let print_time_diff start stop =
+let get_time_diffs times =
+  let start, stop = times in
   let millisec_diff = ((stop -. start) *. 1000.) in
   let millisecs = (int_of_float millisec_diff) mod 1000 in
   let secs = (int_of_float millisec_diff / 1000) mod 60 in
   let mins = int_of_float millisec_diff / 60000 in
-  Printf.printf "\n\nExecution time: %dm %ds %dms (total: %fms)\n" mins secs millisecs millisec_diff;
+  (mins, secs, millisecs, millisec_diff)
+
+
+let print_time execution_time parse_time =
+  let parse_mins, parse_secs, parse_millisecs, parse_millisec_diff = get_time_diffs parse_time in
+  let exe_mins, exe_secs, exe_millisecs, exe_millisec_diff = get_time_diffs execution_time in
+  Printf.printf "\n\n";
+  Printf.printf "Execution time: %dm %ds %dms (total: %fms)" exe_mins exe_secs exe_millisecs exe_millisec_diff;
+  Printf.printf " | ";
+  Printf.printf "Parse time: %dm %ds %dms (total: %fms)\n" parse_mins parse_secs parse_millisecs parse_millisec_diff;
   flush stdout
 
 
 let () =
   Arg.parse speclist handle_anonymous usage;
   load_resources ();
-  let start_time = Unix.gettimeofday () in (* execution timing *)
-  let mem = run !program !input !options in ();
-  let stop_time = Unix.gettimeofday () in (* execution timing *)
+  
+  let mem, execution_time, parse_time = run !program !input !options in ();
+
   if !dump_memory then Memory.print_memory mem; (* print memory dump *)
-  if !print_exec_time then print_time_diff start_time stop_time;
+  if !print_exec_time then print_time execution_time parse_time;
   if not (!memory_dump_file = "") then Memory.save_memory_to_file mem !memory_dump_file (* save memory dump to a file *)
