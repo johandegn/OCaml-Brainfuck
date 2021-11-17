@@ -50,11 +50,13 @@ let handle_input mem inp opts =
 
 let interpret mem inp ins_lst opts =
   let rec loop mem inp body =
+    if !(opts.terminate_now) then (mem, inp) else
     if mem.c = 0 then (mem, inp) else
     let (mem, inp) = interpret mem inp body in
     loop mem inp body
 
   and interpret mem inp ins_lst =
+    if !(opts.terminate_now) then (mem, inp) else
     match ins_lst with
     | [] -> (mem, inp)
     | ins::rest -> (

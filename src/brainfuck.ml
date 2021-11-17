@@ -9,7 +9,7 @@ let memory_dump_file = ref ""
 let request_input = ref false
 let no_flush = ref false
 let print_exec_time = ref false
-let options = ref {end_of_input = 0; request_input = false; always_flush = false}
+let options = ref {end_of_input = 0; request_input = false; always_flush = false; terminate_now = ref false}
 
 let usage = "usage: " ^ Sys.argv.(0) ^ " [-c cmd | file] [-i file | input] [options]"
 
@@ -91,10 +91,17 @@ let print_time execution_time parse_time =
   flush stdout
 
 
+let handle_sigint _ =
+  (!options).terminate_now := true;
+  Printf.printf "\nProgram terminated prematurely!"
+
+
 let () =
   Arg.parse speclist handle_anonymous usage;
   load_resources ();
-  
+
+  Sys.set_signal Sys.sigint (Sys.Signal_handle handle_sigint);
+
   let mem, execution_time, parse_time = run !program !input !options in ();
 
   if !dump_memory then Memory.print_memory mem; (* print memory dump *)
