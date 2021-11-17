@@ -12,21 +12,18 @@ let paranteses_match token_lst =
     | [] -> if balance = 0 then true else false in
   inner token_lst 0
 
-let rec gen_ast token_lst =
-  let rec count_vals lst = 
-    match lst with
-    | Increase::l -> let (c, rl) = (count_vals l) in (c + 1, rl)
-    | Decrease::l -> let (c, rl) = (count_vals l) in (c - 1, rl)
-    | _ -> (0, lst) in
+let rec generate_ast token_lst =
 
-  let rec count_shifts lst = 
-    match lst with
-    | RightShift::l -> let (c, rl) = (count_shifts l) in (c + 1, rl)
-    | LeftShift::l -> let (c, rl) = (count_shifts l) in (c - 1, rl)
-    | _ -> (0, lst) in
+  let count inc dec lst =
+    let rec count c lst =
+      match lst with
+      | t::l when t = inc -> count (c + 1) l
+      | t::l when t = dec -> count (c - 1) l
+      | _ -> (c, lst) in
+    count 0 lst in
 
   let loop_tail lst =
-    let rec inner lst c = 
+    let rec inner lst c =
       match lst with
       | OpenBracket::l -> inner l (c + 1)
       | CloseBracket::l -> if c = 0 then l else inner l (c - 1)
@@ -37,19 +34,19 @@ let rec gen_ast token_lst =
   match token_lst with
   | Increase::_
   | Decrease::_ ->
-    let (c, lr) = count_vals token_lst in
-    Nodes.ChangeVal c :: gen_ast lr
+    let (c, lst) = count Increase Decrease token_lst in
+    Nodes.ChangeVal c :: generate_ast lst
   | RightShift::_
   | LeftShift::_ ->
-    let (c, lr) = count_shifts token_lst in
-    Nodes.ChangePtr c :: gen_ast lr
-  | OpenBracket::l -> Nodes.Loop (gen_ast l) :: gen_ast (loop_tail l)
+    let (c, lst) = count RightShift LeftShift token_lst in
+    Nodes.ChangePtr c :: generate_ast lst
+  | OpenBracket::l -> Nodes.Loop (generate_ast l) :: generate_ast (loop_tail l)
   | CloseBracket::_ -> []
-  | Input::l -> Nodes.InputValue :: gen_ast l
-  | Output::l -> Nodes.PrintValue :: gen_ast l
+  | Input::l -> Nodes.InputValue :: generate_ast l
+  | Output::l -> Nodes.PrintValue :: generate_ast l
   | _ -> []
   
 
 let parse token_lst = 
   if not @@ paranteses_match token_lst then raise (Parse "Mismatching parenteses");
-  gen_ast token_lst
+  generate_ast token_lst
