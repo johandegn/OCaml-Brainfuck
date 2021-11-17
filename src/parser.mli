@@ -1,1 +1,1 @@
-val parse : Tokens.token list -> Nodes.node;;
+val parse : Tokens.token list -> Nodes.node list;;

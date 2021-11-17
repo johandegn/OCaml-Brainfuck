@@ -1,5 +1,6 @@
 open Memory
 open Options
+open Nodes
 
 exception Pointer of string
 exception Value of string
@@ -51,25 +52,26 @@ let handle_input mem inp opts =
   ({mem with c = v}, inp1)
 
 
-let interpret mem ast inp opts =
-  let rec interpret mem ast inp =
-    match ast with
-    | Nodes.Tuple (ast1, ast2) ->
-      let (mem1, inp1) = interpret mem ast1 inp in
-      interpret mem1 ast2 inp1
-    | Nodes.Loop ast1 ->
-      if mem.c = 0 then (mem, inp) else 
-      let (mem1, inp1) = interpret mem ast1 inp in
-      interpret mem1 ast inp1
-    | Nodes.ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
-    | Nodes.ChangePtr n -> (shift_memory mem n, inp)
-    | Nodes.InputValue -> check_pointer mem; handle_input mem inp opts
-    | Nodes.PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp)
-    | Nodes.Nop -> (mem, inp) in
+let interpret mem inp ins_lst opts =
+  let rec interpret mem inp ins_lst =
+    match ins_lst with
+    | [] -> (mem, inp)
+    | ins::rest -> (
+      let (mem, inp) = match ins with
+      | Loop body_lst ->
+        if mem.c = 0 then (mem, inp) 
+        else let (mem, inp) = interpret mem inp body_lst in
+        interpret mem inp (ins::[])
+      | ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
+      | ChangePtr n -> (shift_memory mem n, inp)
+      | InputValue -> check_pointer mem; handle_input mem inp opts
+      | PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp) in
+      
+      interpret mem inp rest) in
   
-  interpret mem ast inp
+  interpret mem inp ins_lst
 
 
-let eval ast inp opts =
-  let (mem, res_inp) = interpret {l = []; c = 0; r = []; ptr = 0} ast inp opts in
+let eval ins_lst inp opts =
+  let (mem, _) = interpret {l = []; c = 0; r = []; ptr = 0} inp ins_lst opts in
   mem
