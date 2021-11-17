@@ -53,22 +53,22 @@ let handle_input mem inp opts =
 
 
 let interpret mem inp ins_lst opts =
-  let rec interpret mem inp ins_lst =
+  let rec loop mem inp body =
+    if mem.c = 0 then (mem, inp) else
+    let (mem, inp) = interpret mem inp body in
+    loop mem inp body
+
+  and interpret mem inp ins_lst =
     match ins_lst with
     | [] -> (mem, inp)
     | ins::rest -> (
       let (mem, inp) = match ins with
-      | Loop body_lst ->
-        if mem.c = 0 then (mem, inp) 
-        else let (mem, inp) = interpret mem inp body_lst in
-        interpret mem inp (ins::[])
       | ChangeVal n -> check_pointer mem; ({mem with c = mem.c + n}, inp)
       | ChangePtr n -> (shift_memory mem n, inp)
       | InputValue -> check_pointer mem; handle_input mem inp opts
-      | PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp) in
-      
+      | PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp)
+      | Loop body_lst -> loop mem inp body_lst in
       interpret mem inp rest) in
-  
   interpret mem inp ins_lst
 
 
