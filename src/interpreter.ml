@@ -6,22 +6,19 @@ exception Pointer of string
 exception Value of string
 
 let shift_memory mem am =
-  let fix_lst lst = (* TODO: Also remove 0 if they are leading or tailing to save memory? *)
-    match lst with
-    | [] -> 0::[]
-    | _ -> lst in
-  
+  let shift fr_lst c to_lst =
+    match fr_lst with
+    | head::tail -> (tail, head, c::to_lst)
+    | [] -> ([], 0, c::to_lst) in
+
   let positive = am > 0 in
   let rec inner mem i =
     if i = 0 then mem else
-    let (new_l, new_c, new_r) = if positive then
-    match (fix_lst mem.r) with
-    | c::rs -> (mem.c::mem.l, c, rs)
-    | [] -> failwith "List was empty. This should not be able to happen" else
-    match (fix_lst mem.l) with
-    | c::ls -> (ls, c, mem.c::mem.r)
-    | [] -> failwith "List was empty. This should not be able to happen" in
-    inner {mem with l = new_l; r = new_r; c = new_c} (i - 1) in
+    let (l, c, r) = if positive 
+    then let (r, c, l) = shift mem.r mem.c mem.l in (l, c, r)
+    else shift mem.l mem.c mem.r in
+    inner {mem with l; r; c} (i - 1) in
+    
   let new_mem = inner mem (abs am) in {new_mem with ptr = mem.ptr + am}
 
 
@@ -40,8 +37,7 @@ let get_inp () =
 
 
 let handle_input mem inp opts =
-  let (v, inp1) =
-  match inp with
+  let (v, inp1) = match inp with
   | v::inp1 -> (v, inp1)
   | [] -> if opts.request_input then 
     match (get_inp ()) with
