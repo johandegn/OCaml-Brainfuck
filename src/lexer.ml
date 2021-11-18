@@ -2,14 +2,7 @@ open Tokens
 
 let valid_symbol c =
   match c with
-  | ','
-  | '.'
-  | '+'
-  | '-'
-  | '<'
-  | '>'
-  | '['
-  | ']' -> true
+  | ',' | '.' | '+' | '-' | '<' | '>' | '[' | ']' -> true
   | _ -> false
 
 let get_token c = 

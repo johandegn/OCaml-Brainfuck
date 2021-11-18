@@ -9,7 +9,9 @@ let memory_dump_file = ref ""
 let request_input = ref false
 let no_flush = ref false
 let print_exec_time = ref false
-let options = ref {end_of_input = 0; request_input = false; always_flush = false; terminate_now = ref false}
+let run_options = ref {end_of_input = 0; request_input = false; always_flush = false; terminate_now = ref false}
+let no_optimize = ref false
+let parse_options = ref { optimize = true }
 
 let usage = "usage: " ^ Sys.argv.(0) ^ " [-c cmd | file] [-i file | input] [options]"
 
@@ -38,7 +40,7 @@ let handle_anonymous arg =
 
 
   let set_eoi i =
-    options := {!options with end_of_input = i}
+    run_options := {!run_options with end_of_input = i}
 
 
 let speclist = [
@@ -50,24 +52,26 @@ let speclist = [
     ("-D", Arg.Set_string memory_dump_file, ": Write memory dump to file after termination.");
     ("-p", Arg.Set no_flush, ": Do NOT flush output on each print.");
     ("-t", Arg.Set print_exec_time, ": Print execution and parse time.");
+    ("-n", Arg.Set no_optimize, ": Do NOT optimize code. Increases instructions.")
   ]
 
 
 let load_resources () =
   if not (!program_path = "") then program := Utility.read_file !program_path;
   if not (!input_path = "") then input := Utility.read_file !input_path;
-  options := {!options with request_input = !request_input; always_flush = not !no_flush}
+  run_options := {!run_options with request_input = !request_input; always_flush = not !no_flush};
+  parse_options := {optimize = not !no_optimize}
 
 
-let run code input options =
+let run code input parse_options run_options =
   let enc_inp = Utility.encode_input input in (* encode input *)
 
   let start_parse_time = Unix.gettimeofday () in (* parse timing *)
-  let ast = Parser.parse (Lexer.tokenize code) in
+  let ast = Lexer.tokenize code |> Parser.parse parse_options in
   let stop_parse_time = Unix.gettimeofday () in (* parse timing *)
   
   let start_exe_time = Unix.gettimeofday () in (* execution timing *)
-  let mem = Interpreter.eval ast enc_inp options in
+  let mem = Interpreter.eval ast enc_inp run_options in
   let stop_exe_time = Unix.gettimeofday () in (* execution timing *)
   (mem, (start_exe_time, stop_exe_time), (start_parse_time, stop_parse_time))
 
@@ -92,8 +96,8 @@ let print_time execution_time parse_time =
 
 
 let handle_sigint _ =
-  (!options).terminate_now := true;
-  Printf.printf "\nProgram terminated prematurely!"
+  Printf.printf "\nProgram terminated prematurely!";
+  (!run_options).terminate_now := true
 
 
 let () =
@@ -102,7 +106,7 @@ let () =
 
   Sys.set_signal Sys.sigint (Sys.Signal_handle handle_sigint);
 
-  let mem, execution_time, parse_time = run !program !input !options in ();
+  let mem, execution_time, parse_time = run !program !input !parse_options !run_options in ();
 
   if !dump_memory then Memory.print_memory mem; (* print memory dump *)
   if !print_exec_time then print_time execution_time parse_time;
