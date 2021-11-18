@@ -71,5 +71,5 @@ let interpret mem inp ins_lst opts =
 
 
 let eval ins_lst inp opts =
-  let (mem, _) = interpret {l = []; c = 0; r = []; ptr = 0} inp ins_lst opts in
-  mem
+  let mem = {l = []; c = 0; r = []; ptr = 0} in
+  interpret mem inp ins_lst opts |> fst
