@@ -9,7 +9,7 @@ let encode_input str =
 let read_file filename =
   let ch = open_in filename in
   try
-    let s = really_input_string ch (in_channel_length ch - 1) in (* TODO: does -1 remove newline char, charied return, return or somthing?*)
+    let s = really_input_string ch (in_channel_length ch) in
     close_in ch;
     s
   with e ->
