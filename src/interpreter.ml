@@ -49,6 +49,7 @@ let handle_input mem inp opts =
 
 
 let interpret mem inp ins_lst opts =
+  let ins_count = ref Int64.zero in
   let rec loop mem inp body =
     if !(opts.terminate_now) then (mem, inp) else
     if mem.c = 0 then (mem, inp) else
@@ -56,7 +57,8 @@ let interpret mem inp ins_lst opts =
     loop mem inp body
 
   and interpret mem inp ins_lst =
-    if !(opts.terminate_now) then (mem, inp) else
+  if opts.count_instructions then ins_count := Int64.succ !ins_count;
+  if !(opts.terminate_now) then (mem, inp) else
     match ins_lst with
     | [] -> (mem, inp)
     | ins::rest -> (
@@ -67,9 +69,10 @@ let interpret mem inp ins_lst opts =
       | PrintValue -> check_pointer mem; print_value mem.c opts.always_flush; (mem, inp)
       | Loop body_lst -> loop mem inp body_lst in
       interpret mem inp rest) in
-  interpret mem inp ins_lst
+  let mem = interpret mem inp ins_lst |> fst in
+  (mem, Int64.to_string !ins_count)
 
 
 let eval ins_lst inp opts =
   let mem = {l = []; c = 0; r = []; ptr = 0} in
-  interpret mem inp ins_lst opts |> fst
+  interpret mem inp ins_lst opts

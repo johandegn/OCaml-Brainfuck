@@ -70,7 +70,7 @@ let output_memory mem out_ch =
 
 (** Prints memory to stdout *)
 let print_memory mem =
-  Printf.printf "\n\n\n"; (* distance to header *)
+  Printf.printf "\n\n"; (* distance to header *)
   output_memory mem stdout
 
 (** Prints memory to a file *)
