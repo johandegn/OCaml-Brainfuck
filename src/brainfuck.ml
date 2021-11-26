@@ -54,7 +54,7 @@ let speclist = [
     ("-p", Arg.Set no_flush, ": Do NOT flush output on each print.");
     ("-t", Arg.Set print_exec_time, ": Print execution and parse time.");
     ("-n", Arg.Set no_optimize, ": Do NOT optimize code. Increases instructions.");
-    ("-s", Arg.Set count_instructions, "Count instructions.");
+    ("-s", Arg.Set count_instructions, ": Count instructions and print after execution.");
   ]
 
 

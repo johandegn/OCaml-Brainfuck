@@ -49,7 +49,7 @@ let handle_input mem inp opts =
 
 
 let interpret mem inp ins_lst opts =
-  let ins_count = ref Int64.zero in
+  let ins_count = ref Int64.minus_one in (* To account for the extra one *)
   let rec loop mem inp body =
     if !(opts.terminate_now) then (mem, inp) else
     if mem.c = 0 then (mem, inp) else
