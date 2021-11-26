@@ -1,1 +1,1 @@
-val tokenize : string -> Tokens.token list;;
+val tokenize : string -> Tokens.token list

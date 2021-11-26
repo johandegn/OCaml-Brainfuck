@@ -14,4 +14,4 @@ let read_file filename =
     s
   with e ->
     close_in_noerr ch; (* emergency closing *)
-    raise e;;
+    raise e
